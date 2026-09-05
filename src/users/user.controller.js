@@ -17,10 +17,21 @@ export async function handle(req, res) {
             return sendJson(res, 201, user);
         }
 
+        case "PUT": {
+            const body = await readBody(req);
+
+            body.id = id;
+
+            const user = userService.update(body);
+
+            return sendJson(res, 200, user);
+        }
+
         case "DELETE": {
-            return sendJson(res, 501, {
-                error: "NOT_IMPLEMENTED"
-            });
+            userService.inactive(id);
+
+            res.writeHead(204);
+            return res.end();
         }
 
         default:
