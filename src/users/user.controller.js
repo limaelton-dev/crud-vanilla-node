@@ -1,11 +1,16 @@
 import * as userService from "./user.service.js";
 import { sendJson, readBody } from "../http/response.js";
 
-export async function handle(req, res) {
+export async function handle(req, res, params) {
+    const { id } = params;
     switch (req.method) {
         case "GET": {
-            const users = userService.findAll();
+            if(id) {
+                const user = userService.find(id);
+                return sendJson(res, 200, user);
+            }
 
+            const users = userService.findAll();
             return sendJson(res, 200, users);
         }
 
@@ -18,6 +23,9 @@ export async function handle(req, res) {
         }
 
         case "PUT": {
+            if(!id) {
+                throw new Error("BAD_REQUEST");
+            }
             const body = await readBody(req);
 
             body.id = id;
@@ -28,6 +36,9 @@ export async function handle(req, res) {
         }
 
         case "DELETE": {
+            if(!id) {
+                throw new Error("BAD_REQUEST");
+            }
             userService.inactive(id);
 
             res.writeHead(204);
